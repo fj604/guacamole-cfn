@@ -61,7 +61,7 @@
             "Metadata": {
                 "AWS::CloudFormation::Init": {
                     "configSets": {
-                        "configure-all": ["install-deps", "install-guacamole", "configure-valve", "configure-nginx"]
+                        "configure-all": ["install-deps", "install-guacamole", "configure-nginx"]
                     },
                     "install-deps": {
                         "commands": {
@@ -87,7 +87,8 @@
                                 "pulseaudio-libs-devel": [],
                                 "openssl-devel": [],
                                 "libvorbis-devel": [],
-                                "libwebp-devel": []
+                                "libwebp-devel": [],
+                                "xmlstarlet": []
                             }
                         },
                         "sources": {
@@ -96,6 +97,17 @@
                         "files": {
                             "/var/lib/tomcat/webapps/guacamole.war": {
                                 "source": "https://www.apache.org/dist/guacamole/1.0.0/binary/guacamole-1.0.0.war"
+                            },
+                            "/valvefix/valvefix.sh": {
+                                "content": { "Fn::Join": [ "\n", [
+                                    "xmlstarlet ed -P -L -s Server/Service/Engine/Host -t elem -n ValveTMP server.xml",
+                                    "xmlstarlet ed -P -L -i Server/Service/Engine/Host/ValveTMP -t attr -n className -v \"org.apache.catalina.valves.RemoteIpValve\" server.xml",
+                                    "xmlstarlet ed -P -L -i Server/Service/Engine/Host/ValveTMP -t attr -n internalProxies -v \"127.0.0.1\" server.xml",
+                                    "xmlstarlet ed -P -L -i Server/Service/Engine/Host/ValveTMP -t attr -n remoteIpHeader -v \"x-forwarded-for\" server.xml",
+                                    "xmlstarlet ed -P -L -i Server/Service/Engine/Host/ValveTMP -t attr -n remoteIpProxiesHeader -v \"x-forwarded-by\" server.xml",
+                                    "xmlstarlet ed -P -L -i Server/Service/Engine/Host/ValveTMP -t attr -n protocolHeader -v \"x-forwarded-proto\" server.xml",
+                                    "xmlstarlet ed -P -L -r Server/Service/Engine/Host/ValveTMP -v Valve server.xml"
+                                ] ] }
                             }
                         },
                         "commands": {
@@ -114,6 +126,13 @@
                             "4-ldconfig": {
                                 "command": "ldconfig",
                                 "cwd": "/guacamole-server/guacamole-server-1.0.0"
+                            },
+                            "5-chmod-valvefix": {
+                                "command": "chmod +x /valvefix/valvefix.sh"
+                            },
+                            "6-add-valve": {
+                                "command": "/valvefix/valvefix.sh",
+                                "cwd": "/etc/tomcat"
                             }
                         },
                         "services": {
@@ -126,35 +145,6 @@
                                     "enabled": "true",
                                     "ensureRunning" : "true"
                                 }
-                            }
-                        }
-                    },
-                    "configure-valve": {
-                        "packages": {
-                            "yum": {
-                                "xmlstarlet": []
-                            }
-                        },
-                        "files": {
-                            "/valvefix/valvefix.sh": {
-                                "content": { "Fn::Join": [ "\n", [
-                                    "xmlstarlet ed -P -L -s Server/Service/Engine/Host -t elem -n ValveTMP server.xml",
-                                    "xmlstarlet ed -P -L -i Server/Service/Engine/Host/ValveTMP -t attr -n className -v \"org.apache.catalina.valves.RemoteIpValve\" server.xml",
-                                    "xmlstarlet ed -P -L -i Server/Service/Engine/Host/ValveTMP -t attr -n internalProxies -v \"127.0.0.1\" server.xml",
-                                    "xmlstarlet ed -P -L -i Server/Service/Engine/Host/ValveTMP -t attr -n remoteIpHeader -v \"x-forwarded-for\" server.xml",
-                                    "xmlstarlet ed -P -L -i Server/Service/Engine/Host/ValveTMP -t attr -n remoteIpProxiesHeader -v \"x-forwarded-by\" server.xml",
-                                    "xmlstarlet ed -P -L -i Server/Service/Engine/Host/ValveTMP -t attr -n protocolHeader -v \"x-forwarded-proto\" server.xml",
-                                    "xmlstarlet ed -P -L -r Server/Service/Engine/Host/ValveTMP -v Valve server.xml"
-                                ] ] }
-                            }
-                        },
-                        "commands": {
-                            "1-chmod-valvefix": {
-                                "command": "chmod +x /valvefix/valvefix.sh"
-                            },
-                            "2-add-valve": {
-                                "command": "/valvefix/valvefix.sh",
-                                "cwd": "/etc/tomcat"
                             }
                         }
                     },
