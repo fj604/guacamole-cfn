@@ -346,7 +346,7 @@
             "Description": "Instance ID",
             "Value": { "Ref": "Instance" }
         },
-        "PrivateIp": {
+        "PublicIp": {
             "Description": "Public IP Address",
             "Value": { "Fn::GetAtt":[ "Instance", "PublicIp"] }
         }
