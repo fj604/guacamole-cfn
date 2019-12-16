@@ -67,6 +67,12 @@
                         "commands": {
                             "1-install-extras": {
                                 "command": "amazon-linux-extras install -y epel tomcat8.5 nginx1"
+                            },
+                            "2-install-libva": {
+                                "command": "yum -y install http://mirror.centos.org/centos/7/os/x86_64/Packages/libva-1.8.3-1.el7.x86_64.rpm"
+                            },
+                            "3-install-rpmfusion": {
+                                "command": "yum -y localinstall --nogpgcheck https://download1.rpmfusion.org/free/el/rpmfusion-free-release-7.noarch.rpm"
                             }
                         }
                     },
@@ -90,7 +96,8 @@
                                 "libwebp-devel": [],
                                 "xmlstarlet": [],
                                 "mariadb-server": [],
-                                "mysql-connector-java": []
+                                "mysql-connector-java": [],
+                                "ffmpeg-devel": []
                             }
                         },
                         "sources": {
