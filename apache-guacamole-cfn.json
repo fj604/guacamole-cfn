@@ -209,6 +209,9 @@
                             }
                         },
                         "files": {
+                            "/etc/nginx/default.d/redirect.conf": {
+                                "content": "return 301 https://$host$request_uri;"
+                            },
                             "/etc/nginx/conf.d/guacamole.conf": {
                                 "content": { "Fn::Join": [ "\n", [
                                     "server {",
@@ -323,6 +326,14 @@
                         "FromPort": 443,
                         "IpProtocol": "tcp",
                         "ToPort": 443
+                    },
+                    {
+                        "CidrIp": {
+                            "Ref": "HTTPSLocation"
+                        },
+                        "FromPort": 80,
+                        "IpProtocol": "tcp",
+                        "ToPort": 80
                     }
                 ],
                 "VpcId": { "Ref": "VpcId" }
