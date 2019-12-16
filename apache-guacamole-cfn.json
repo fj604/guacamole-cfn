@@ -309,7 +309,7 @@
         "InstanceSecurityGroup": {
             "Type": "AWS::EC2::SecurityGroup",
             "Properties": {
-                "GroupDescription": "Enable SSH access via port 22",
+                "GroupDescription": "Access to ports 22, 443 and 80",
                 "SecurityGroupIngress": [
                     {
                         "CidrIp": {
