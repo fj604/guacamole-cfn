@@ -159,10 +159,10 @@
                                 "command": "service mariadb start"
                             },
                             "08-create-db": {
-                                "command": "cat /guacamole-auth/guacamole-auth-jdbc-1.0.0/mysql/createdb.sql | mysql",
+                                "command": "cat /guacamole-auth/guacamole-auth-jdbc-1.0.0/mysql/createdb.sql | mysql"
                             },
                             "09-create-schema": {
-                                "command": "cat /guacamole-auth/guacamole-auth-jdbc-1.0.0/mysql/schema/*.sql | mysql guacamole_db",
+                                "command": "cat /guacamole-auth/guacamole-auth-jdbc-1.0.0/mysql/schema/*.sql | mysql guacamole_db"
                             },
                             "10-mkdir-extensions": {
                                 "command": "mkdir /etc/guacamole/extensions"
