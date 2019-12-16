@@ -88,15 +88,26 @@
                                 "openssl-devel": [],
                                 "libvorbis-devel": [],
                                 "libwebp-devel": [],
-                                "xmlstarlet": []
+                                "xmlstarlet": [],
+                                "mariadb-server": [],
+                                "mysql-connector-java": []
                             }
                         },
                         "sources": {
-                            "/guacamole-server/": "https://www.apache.org/dist/guacamole/1.0.0/source/guacamole-server-1.0.0.tar.gz"
+                            "/guacamole-server/": "https://www.apache.org/dist/guacamole/1.0.0/source/guacamole-server-1.0.0.tar.gz",
+                            "/guacamole-auth/": "https://www.apache.org/dist/guacamole/1.0.0/binary/guacamole-auth-jdbc-1.0.0.tar.gz"
                         },
                         "files": {
                             "/var/lib/tomcat/webapps/guacamole.war": {
                                 "source": "https://www.apache.org/dist/guacamole/1.0.0/binary/guacamole-1.0.0.war"
+                            },
+                            "/guacamole-auth/guacamole-auth-jdbc-1.0.0/mysql/createdb.sql": {
+                                "content": { "Fn::Join": [ "\n", [
+                                    "CREATE DATABASE guacamole_db;",
+                                    "CREATE USER 'guacamole_user'@'localhost' IDENTIFIED BY 'some_password';",
+                                    "GRANT SELECT,INSERT,UPDATE,DELETE ON guacamole_db.* TO 'guacamole_user'@'localhost';",
+                                    "FLUSH PRIVILEGES;"
+                                ] ] }
                             },
                             "/valvefix/valvefix.sh": {
                                 "content": { "Fn::Join": [ "\n", [
@@ -108,31 +119,62 @@
                                     "xmlstarlet ed -P -L -i Server/Service/Engine/Host/ValveTMP -t attr -n protocolHeader -v \"x-forwarded-proto\" server.xml",
                                     "xmlstarlet ed -P -L -r Server/Service/Engine/Host/ValveTMP -v Valve server.xml"
                                 ] ] }
+                            },
+                            "/etc/guacamole/guacamole.properties": {
+                                "content": { "Fn::Join": [ "\n", [
+                                    "# MySQL properties",
+                                    "mysql-hostname: localhost",
+                                    "mysql-port: 3306",
+                                    "mysql-database: guacamole_db",
+                                    "mysql-username: guacamole_user",
+                                    "mysql-password: some_password"
+                                ] ] }
                             }
                         },
                         "commands": {
-                            "1-configure": {
+                            "01-configure": {
                                 "command": "./configure --with-init-dir=/etc/init.d",
                                 "cwd": "/guacamole-server/guacamole-server-1.0.0" 
                             },
-                            "2-make": {
+                            "02-make": {
                                 "command": "make",
                                 "cwd": "/guacamole-server/guacamole-server-1.0.0" 
                             },
-                            "3-make-install": {
+                            "03-make-install": {
                                 "command": "make install",
                                 "cwd": "/guacamole-server/guacamole-server-1.0.0"
                             },
-                            "4-ldconfig": {
+                            "04-ldconfig": {
                                 "command": "ldconfig",
                                 "cwd": "/guacamole-server/guacamole-server-1.0.0"
                             },
-                            "5-chmod-valvefix": {
+                            "05-chmod-valvefix": {
                                 "command": "chmod +x /valvefix/valvefix.sh"
                             },
-                            "6-add-valve": {
+                            "06-add-valve": {
                                 "command": "/valvefix/valvefix.sh",
                                 "cwd": "/etc/tomcat"
+                            },
+                            "07-start-mariadb": {
+                                "command": "service mariadb start"
+                            },
+                            "08-create-db": {
+                                "command": "cat /guacamole-auth/guacamole-auth-jdbc-1.0.0/mysql/createdb.sql | mysql",
+                            },
+                            "09-create-schema": {
+                                "command": "cat /guacamole-auth/guacamole-auth-jdbc-1.0.0/mysql/schema/*.sql | mysql guacamole_db",
+                            },
+                            "10-mkdir-extensions": {
+                                "command": "mkdir /etc/guacamole/extensions"
+                            },
+                            "11-move-jdbc-auth-plugin": {
+                                "command": "mv /guacamole-auth/guacamole-auth-jdbc-1.0.0/mysql/guacamole-auth-jdbc-mysql-1.0.0.jar /etc/guacamole/extensions/"
+                            },
+                            "12-mkdir-lib": {
+                                "command": "mkdir /etc/guacamole/lib"
+                            },
+                            "13-ln-jdbc": {
+                                "command": "ln -s /usr/share/java/mysql-connector-java.jar /etc/guacamole/lib/"
                             }
                         },
                         "services": {
@@ -142,6 +184,10 @@
                                     "ensureRunning" : "true"
                                 },
                                 "tomcat": {
+                                    "enabled": "true",
+                                    "ensureRunning" : "true"
+                                },
+                                "mariadb": {
                                     "enabled": "true",
                                     "ensureRunning" : "true"
                                 }
