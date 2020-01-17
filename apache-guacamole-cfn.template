@@ -1,18 +1,16 @@
 {
     "AWSTemplateFormatVersion": "2010-09-09",
-
     "Description": "Create an EC2 instance of Apache Guacamole clientless remote desktop gateway",
-
     "Parameters": {
-        "VpcId" : {
-            "Type" : "AWS::EC2::VPC::Id",
-            "Description" : "VpcId of your existing Virtual Private Cloud (VPC)",
-            "ConstraintDescription" : "must be the VPC Id of an existing Virtual Private Cloud."
+        "VpcId": {
+            "Type": "AWS::EC2::VPC::Id",
+            "Description": "VpcId of your existing Virtual Private Cloud (VPC)",
+            "ConstraintDescription": "must be the VPC Id of an existing Virtual Private Cloud."
         },
-        "SubnetId" : {
-            "Type" : "AWS::EC2::Subnet::Id",
-            "Description" : "Subnet ID in your Virtual Private Cloud (VPC)",
-            "ConstraintDescription" : "must be an existing subnet in the selected VPC."
+        "SubnetId": {
+            "Type": "AWS::EC2::Subnet::Id",
+            "Description": "Subnet ID in your Virtual Private Cloud (VPC)",
+            "ConstraintDescription": "must be an existing subnet in the selected VPC."
         },
         "InstanceType": {
             "Type": "String",
@@ -61,7 +59,11 @@
             "Metadata": {
                 "AWS::CloudFormation::Init": {
                     "configSets": {
-                        "configure-all": ["install-deps", "install-guacamole", "configure-nginx"]
+                        "configure-all": [
+                            "install-deps",
+                            "install-guacamole",
+                            "configure-nginx"
+                        ]
                     },
                     "install-deps": {
                         "commands": {
@@ -109,43 +111,58 @@
                                 "source": "https://www.apache.org/dist/guacamole/1.0.0/binary/guacamole-1.0.0.war"
                             },
                             "/guacamole-auth/guacamole-auth-jdbc-1.0.0/mysql/createdb.sql": {
-                                "content": { "Fn::Join": [ "\n", [
-                                    "CREATE DATABASE guacamole_db;",
-                                    "CREATE USER 'guacamole_user'@'localhost' IDENTIFIED BY 'some_password';",
-                                    "GRANT SELECT,INSERT,UPDATE,DELETE ON guacamole_db.* TO 'guacamole_user'@'localhost';",
-                                    "FLUSH PRIVILEGES;"
-                                ] ] }
+                                "content": {
+                                    "Fn::Join": [
+                                        "\n",
+                                        [
+                                            "CREATE DATABASE guacamole_db;",
+                                            "CREATE USER 'guacamole_user'@'localhost' IDENTIFIED BY 'some_password';",
+                                            "GRANT SELECT,INSERT,UPDATE,DELETE ON guacamole_db.* TO 'guacamole_user'@'localhost';",
+                                            "FLUSH PRIVILEGES;"
+                                        ]
+                                    ]
+                                }
                             },
                             "/valvefix/valvefix.sh": {
-                                "content": { "Fn::Join": [ "\n", [
-                                    "xmlstarlet ed -P -L -s Server/Service/Engine/Host -t elem -n ValveTMP server.xml",
-                                    "xmlstarlet ed -P -L -i Server/Service/Engine/Host/ValveTMP -t attr -n className -v \"org.apache.catalina.valves.RemoteIpValve\" server.xml",
-                                    "xmlstarlet ed -P -L -i Server/Service/Engine/Host/ValveTMP -t attr -n internalProxies -v \"127.0.0.1\" server.xml",
-                                    "xmlstarlet ed -P -L -i Server/Service/Engine/Host/ValveTMP -t attr -n remoteIpHeader -v \"x-forwarded-for\" server.xml",
-                                    "xmlstarlet ed -P -L -i Server/Service/Engine/Host/ValveTMP -t attr -n remoteIpProxiesHeader -v \"x-forwarded-by\" server.xml",
-                                    "xmlstarlet ed -P -L -i Server/Service/Engine/Host/ValveTMP -t attr -n protocolHeader -v \"x-forwarded-proto\" server.xml",
-                                    "xmlstarlet ed -P -L -r Server/Service/Engine/Host/ValveTMP -v Valve server.xml"
-                                ] ] }
+                                "content": {
+                                    "Fn::Join": [
+                                        "\n",
+                                        [
+                                            "xmlstarlet ed -P -L -s Server/Service/Engine/Host -t elem -n ValveTMP server.xml",
+                                            "xmlstarlet ed -P -L -i Server/Service/Engine/Host/ValveTMP -t attr -n className -v \"org.apache.catalina.valves.RemoteIpValve\" server.xml",
+                                            "xmlstarlet ed -P -L -i Server/Service/Engine/Host/ValveTMP -t attr -n internalProxies -v \"127.0.0.1\" server.xml",
+                                            "xmlstarlet ed -P -L -i Server/Service/Engine/Host/ValveTMP -t attr -n remoteIpHeader -v \"x-forwarded-for\" server.xml",
+                                            "xmlstarlet ed -P -L -i Server/Service/Engine/Host/ValveTMP -t attr -n remoteIpProxiesHeader -v \"x-forwarded-by\" server.xml",
+                                            "xmlstarlet ed -P -L -i Server/Service/Engine/Host/ValveTMP -t attr -n protocolHeader -v \"x-forwarded-proto\" server.xml",
+                                            "xmlstarlet ed -P -L -r Server/Service/Engine/Host/ValveTMP -v Valve server.xml"
+                                        ]
+                                    ]
+                                }
                             },
                             "/etc/guacamole/guacamole.properties": {
-                                "content": { "Fn::Join": [ "\n", [
-                                    "# MySQL properties",
-                                    "mysql-hostname: localhost",
-                                    "mysql-port: 3306",
-                                    "mysql-database: guacamole_db",
-                                    "mysql-username: guacamole_user",
-                                    "mysql-password: some_password"
-                                ] ] }
+                                "content": {
+                                    "Fn::Join": [
+                                        "\n",
+                                        [
+                                            "# MySQL properties",
+                                            "mysql-hostname: localhost",
+                                            "mysql-port: 3306",
+                                            "mysql-database: guacamole_db",
+                                            "mysql-username: guacamole_user",
+                                            "mysql-password: some_password"
+                                        ]
+                                    ]
+                                }
                             }
                         },
                         "commands": {
                             "01-configure": {
                                 "command": "./configure --with-init-dir=/etc/init.d",
-                                "cwd": "/guacamole-server/guacamole-server-1.0.0" 
+                                "cwd": "/guacamole-server/guacamole-server-1.0.0"
                             },
                             "02-make": {
                                 "command": "make",
-                                "cwd": "/guacamole-server/guacamole-server-1.0.0" 
+                                "cwd": "/guacamole-server/guacamole-server-1.0.0"
                             },
                             "03-make-install": {
                                 "command": "make install",
@@ -188,15 +205,15 @@
                             "sysvinit": {
                                 "guacd": {
                                     "enabled": "true",
-                                    "ensureRunning" : "true"
+                                    "ensureRunning": "true"
                                 },
                                 "tomcat": {
                                     "enabled": "true",
-                                    "ensureRunning" : "true"
+                                    "ensureRunning": "true"
                                 },
                                 "mariadb": {
                                     "enabled": "true",
-                                    "ensureRunning" : "true"
+                                    "ensureRunning": "true"
                                 }
                             }
                         }
@@ -213,30 +230,35 @@
                                 "content": "return 301 https://$host$request_uri;"
                             },
                             "/etc/nginx/conf.d/guacamole.conf": {
-                                "content": { "Fn::Join": [ "\n", [
-                                    "server {",
-                                    "   listen       443 ssl http2 default_server;",
-                                    "   server_name  localhost;",
-                                    "   ssl_certificate      /etc/pki/tls/certs/localhost.pem;",
-                                    "   ssl_certificate_key  /etc/pki/tls/certs/localhost.pem;",
-                                    "       location / {",
-                                    "           proxy_pass http://localhost:8080/guacamole/;",
-                                    "           proxy_buffering off;",
-                                    "           proxy_http_version 1.1;",
-                                    "           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;",
-                                    "           proxy_set_header Upgrade $http_upgrade;",
-                                    "           proxy_set_header Connection $http_connection;",
-                                    "           access_log off;",
-                                    "       }",
-                                    "}"
-                                ] ] } 
+                                "content": {
+                                    "Fn::Join": [
+                                        "\n",
+                                        [
+                                            "server {",
+                                            "   listen       443 ssl http2 default_server;",
+                                            "   server_name  localhost;",
+                                            "   ssl_certificate      /etc/pki/tls/certs/localhost.pem;",
+                                            "   ssl_certificate_key  /etc/pki/tls/certs/localhost.pem;",
+                                            "       location / {",
+                                            "           proxy_pass http://localhost:8080/guacamole/;",
+                                            "           proxy_buffering off;",
+                                            "           proxy_http_version 1.1;",
+                                            "           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;",
+                                            "           proxy_set_header Upgrade $http_upgrade;",
+                                            "           proxy_set_header Connection $http_connection;",
+                                            "           access_log off;",
+                                            "       }",
+                                            "}"
+                                        ]
+                                    ]
+                                }
                             }
                         },
                         "services": {
                             "sysvinit": {
                                 "nginx": {
                                     "enabled": "true",
-                                    "ensureRunning" : "true"
+                                    "ensureRunning": "true"
                                 }
                             }
                         }
@@ -249,10 +271,18 @@
                 }
             },
             "Properties": {
-                "ImageId": { "Ref": "LatestAmiId" },
-                "InstanceType": { "Ref": "InstanceType" },
-                "KeyName": { "Ref": "Keypair" },
-                "SubnetId": { "Ref": "SubnetId" },
+                "ImageId": {
+                    "Ref": "LatestAmiId"
+                },
+                "InstanceType": {
+                    "Ref": "InstanceType"
+                },
+                "KeyName": {
+                    "Ref": "Keypair"
+                },
+                "SubnetId": {
+                    "Ref": "SubnetId"
+                },
                 "SecurityGroupIds": [
                     {
                         "Ref": "InstanceSecurityGroup"
@@ -305,7 +335,6 @@
                 }
             }
         },
-
         "InstanceSecurityGroup": {
             "Type": "AWS::EC2::SecurityGroup",
             "Properties": {
@@ -336,19 +365,27 @@
                         "ToPort": 80
                     }
                 ],
-                "VpcId": { "Ref": "VpcId" }
+                "VpcId": {
+                    "Ref": "VpcId"
+                }
             }
         }
     },
-
     "Outputs": {
         "InstanceId": {
             "Description": "Instance ID",
-            "Value": { "Ref": "Instance" }
+            "Value": {
+                "Ref": "Instance"
+            }
         },
         "PublicIp": {
             "Description": "Public IP Address",
-            "Value": { "Fn::GetAtt":[ "Instance", "PublicIp"] }
+            "Value": {
+                "Fn::GetAtt": [
+                    "Instance",
+                    "PublicIp"
+                ]
+            }
         }
     }
 }
