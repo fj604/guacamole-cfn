@@ -91,6 +91,7 @@
                                 "libssh2-devel": [],
                                 "libtelnet-devel": [],
                                 "libvncserver-devel": [],
+                                "libwebsockets-devel": [],
                                 "pulseaudio-libs-devel": [],
                                 "openssl-devel": [],
                                 "libvorbis-devel": [],
@@ -109,7 +110,7 @@
                             "/var/lib/tomcat/webapps/guacamole.war": {
                                 "source": "https://www.apache.org/dist/guacamole/1.1.0/binary/guacamole-1.1.0.war"
                             },
-                            "/guacamole-auth/guacamole-auth-jdbc-1.0.0/mysql/createdb.sql": {
+                            "/guacamole-auth/guacamole-auth-jdbc-1.1.0/mysql/createdb.sql": {
                                 "content": {
                                     "Fn::Join": [
                                         "\n",
