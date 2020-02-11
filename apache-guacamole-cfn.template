@@ -82,7 +82,6 @@
                         "packages": {
                             "yum": {
                                 "gcc": [],
-                                "freerdp1.2-devel": [],
                                 "cairo-devel": [],
                                 "libjpeg-turbo-devel": [],
                                 "libpng-devel": [],
@@ -96,6 +95,7 @@
                                 "openssl-devel": [],
                                 "libvorbis-devel": [],
                                 "libwebp-devel": [],
+                                "libavcodec": [],
                                 "xmlstarlet": [],
                                 "mariadb-server": [],
                                 "mysql-connector-java": [],
@@ -103,12 +103,12 @@
                             }
                         },
                         "sources": {
-                            "/guacamole-server/": "https://www.apache.org/dist/guacamole/1.0.0/source/guacamole-server-1.0.0.tar.gz",
-                            "/guacamole-auth/": "https://www.apache.org/dist/guacamole/1.0.0/binary/guacamole-auth-jdbc-1.0.0.tar.gz"
+                            "/guacamole-server/": "https://www.apache.org/dist/guacamole/1.1.0/source/guacamole-server-1.1.0.tar.gz",
+                            "/guacamole-auth/": "https://www.apache.org/dist/guacamole/1.1.0/binary/guacamole-auth-jdbc-1.1.0.tar.gz"
                         },
                         "files": {
                             "/var/lib/tomcat/webapps/guacamole.war": {
-                                "source": "https://www.apache.org/dist/guacamole/1.0.0/binary/guacamole-1.0.0.war"
+                                "source": "https://www.apache.org/dist/guacamole/1.1.0/binary/guacamole-1.1.0.war"
                             },
                             "/guacamole-auth/guacamole-auth-jdbc-1.0.0/mysql/createdb.sql": {
                                 "content": {
@@ -158,19 +158,19 @@
                         "commands": {
                             "01-configure": {
                                 "command": "./configure --with-init-dir=/etc/init.d",
-                                "cwd": "/guacamole-server/guacamole-server-1.0.0"
+                                "cwd": "/guacamole-server/guacamole-server-1.1.0"
                             },
                             "02-make": {
                                 "command": "make",
-                                "cwd": "/guacamole-server/guacamole-server-1.0.0"
+                                "cwd": "/guacamole-server/guacamole-server-1.1.0"
                             },
                             "03-make-install": {
                                 "command": "make install",
-                                "cwd": "/guacamole-server/guacamole-server-1.0.0"
+                                "cwd": "/guacamole-server/guacamole-server-1.1.0"
                             },
                             "04-ldconfig": {
                                 "command": "ldconfig",
-                                "cwd": "/guacamole-server/guacamole-server-1.0.0"
+                                "cwd": "/guacamole-server/guacamole-server-1.1.0"
                             },
                             "05-chmod-valvefix": {
                                 "command": "chmod +x /valvefix/valvefix.sh"
@@ -183,16 +183,16 @@
                                 "command": "service mariadb start"
                             },
                             "08-create-db": {
-                                "command": "cat /guacamole-auth/guacamole-auth-jdbc-1.0.0/mysql/createdb.sql | mysql"
+                                "command": "cat /guacamole-auth/guacamole-auth-jdbc-1.1.0/mysql/createdb.sql | mysql"
                             },
                             "09-create-schema": {
-                                "command": "cat /guacamole-auth/guacamole-auth-jdbc-1.0.0/mysql/schema/*.sql | mysql guacamole_db"
+                                "command": "cat /guacamole-auth/guacamole-auth-jdbc-1.1.0/mysql/schema/*.sql | mysql guacamole_db"
                             },
                             "10-mkdir-extensions": {
                                 "command": "mkdir /etc/guacamole/extensions"
                             },
                             "11-move-jdbc-auth-plugin": {
-                                "command": "mv /guacamole-auth/guacamole-auth-jdbc-1.0.0/mysql/guacamole-auth-jdbc-mysql-1.0.0.jar /etc/guacamole/extensions/"
+                                "command": "mv /guacamole-auth/guacamole-auth-jdbc-1.1.0/mysql/guacamole-auth-jdbc-mysql-1.1.0.jar /etc/guacamole/extensions/"
                             },
                             "12-mkdir-lib": {
                                 "command": "mkdir /etc/guacamole/lib"
