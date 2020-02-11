@@ -95,7 +95,6 @@
                                 "openssl-devel": [],
                                 "libvorbis-devel": [],
                                 "libwebp-devel": [],
-                                "libavcodec": [],
                                 "xmlstarlet": [],
                                 "mariadb-server": [],
                                 "mysql-connector-java": [],
